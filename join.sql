@@ -28,10 +28,10 @@ CREATE OR ALTER FUNCTION dbo.EstimateDistance (
 )
 RETURNS bigint
 AS BEGIN
-	DECLARE @a float		=	Cos(@lat1)
-	DECLARE @distlat float	=	111132.92 - 559.82 * 2 * @a + 1.175 * 4 * @a - 0.0023 * 6 * @a
-	DECLARE @distlon float	=	111412.84 * @a - 93.5 * 3 * @a + 0.118 * 5 * @a
-	DECLARE @b float		=	0.00 --Cos(@lat2)
+	DECLARE @a float			=	Cos(@lat1)
+	DECLARE @distlat float			=	111132.92 - 559.82 * 2 * @a + 1.175 * 4 * @a - 0.0023 * 6 * @a
+	DECLARE @distlon float			=	111412.84 * @a - 93.5 * 3 * @a + 0.118 * 5 * @a
+	DECLARE @b float			=	0.00 --Cos(@lat2)
 	-- -- removed averaging to improve speed at the cost of accuracy
 	--DECLARE @distlat2 float		=	111132.92 - 559.82 * 2 * @b + 1.175 * 4 * @b - 0.0023 * 6 * @b
 	--DECLARE @distlon2 float		=	111412.84 * @b - 93.5 * 3 * @b + 0.118 * 5 * @b
@@ -39,7 +39,7 @@ AS BEGIN
 	--DECLARE @distlon float		=	(@distlon1 + @distlon2) / 2
 	SET @a					=	ABS(@lat2 - @lat1) * @distlat
 	SET @b					=	ABS(@lon2 - @lon1) * @distlon
-	DECLARE @ret float		=	SQRT(POWER(@a, 2) + POWER(@b, 2))
+	DECLARE @ret float			=	SQRT(POWER(@a, 2) + POWER(@b, 2))
 	RETURN @ret
 END;
 GO
@@ -58,11 +58,12 @@ RETURNS TABLE AS RETURN (
 			, Branch		=	CASE WHEN ABS(@BranchLat) > 0 AND ABS(@BranchLon) > 0 THEN geography::Point(@BranchLat, @BranchLon, 4326) ELSE NULL END
 	)
 	SELECT 
-		  BusinessToHome	=	CASE WHEN Bus IS NOT NULL AND Branch IS NOT NULL THEN 		Round(Bus.STDistance(Home), 2)		ELSE NULL END
-		, BusinessToBranch	=	CASE WHEN Home IS NOT NULL AND Branch IS NOT NULL THEN 		Round(Bus.STDistance(Branch), 2) 	ELSE NULL END
-		, HomeToBranch		=	CASE WHEN Home IS NOT NULL AND Bus IS NOT NULL THEN 	
+		  BusinessToHome		=	CASE WHEN Bus IS NOT NULL AND Branch IS NOT NULL THEN 		Round(Bus.STDistance(Home), 2)		ELSE NULL END
+		, BusinessToBranch		=	CASE WHEN Home IS NOT NULL AND Branch IS NOT NULL THEN 		Round(Bus.STDistance(Branch), 2) 	ELSE NULL END
+		, HomeToBranch			=	CASE WHEN Home IS NOT NULL AND Bus IS NOT NULL THEN 	
 								CASE WHEN @HomeLat = @BusLat AND @HomeLon = @BusLon THEN NULL
-								ELSE 														Round(Home.STDistance(Branch), 2) 	END ELSE NULL END
+								ELSE Round(Home.STDistance(Branch), 2) 	
+								END ELSE NULL END
 	FROM loc
 )
 GO
@@ -74,9 +75,10 @@ SELECT cremcre.ccodcta
 	, cremcre.ccodcli
 	, [OutstandingAmount]		=	Round(cremcre.ncapdes - cremcre.ncappag, 2)
 	, [CurrentOverdueDays]		=	ISNULL(MAX(CASE
-		WHEN credppg.cestado = 'P' THEN	0
-		WHEN credppg.cestado = 'E'	AND	credppg.dfecven < @db_date THEN DATEDIFF(day, credppg.dfecven, @db_date )
-		WHEN credppg.cestado = 'E' THEN 0
+		WHEN credppg.cestado 	= 'P' 		THEN	0
+		WHEN credppg.cestado 	= 'E'
+		AND  credppg.dfecven 	< @db_date 	THEN 	DATEDIFF(day, credppg.dfecven, @db_date )
+		WHEN credppg.cestado 	= 'E' 		THEN 	0
 		END), 0)
 INTO #selection FROM cremcre
 INNER JOIN credppg ON cremcre.ccodcta = credppg.ccodcta
@@ -87,24 +89,24 @@ GROUP BY cremcre.ccodcta, cremcre.ccodcli, cremcre.ncapdes, cremcre.ncappag, cre
 DROP TABLE IF EXISTS #selection2
 SELECT #selection.*
 --	, #upload.*
-	, ApplicationDate	=	CONVERT(VARCHAR, dFecSol, 23)
-	, nmonapr			AS	AmountApproved
+	, ApplicationDate		=	CONVERT(VARCHAR, dFecSol, 23)
+	, AmountApproved		=	nmonapr	
 	, Age				=	DATEDIFF(YEAR, dnacimi, @db_date)
 	, Gender			=	CASE WHEN csexo = 'F' THEN 'Female' WHEN csexo = 'M' THEN 'Male' WHEN csexo IS NULL THEN 'Other' END
-	, GenderFemale		=	CASE WHEN csexo = 'F' THEN 1 WHEN csexo = 'M' THEN 0 END
-	, MaritalStatus		=	(SELECT TOP 1 cdescri FROM tabttab WHERE ccodtab = 12 AND climide.cestciv = tabttab.ccodigo)
-	, ccodana			AS	LoanOfficer
-	, DisbursementDate	=	CONVERT(VARCHAR, dfecvig, 23)
-	, cremcre.ccodofi	AS	BranchCode
-	, LoanPurpose		=	(SELECT TOP 1 cdescri FROM tabttab WHERE ccodtab = 099 AND cremcre.cProCre = tabttab.ccodigo)
+	, GenderFemale			=	CASE WHEN csexo = 'F' THEN 1 WHEN csexo = 'M' THEN 0 END
+	, MaritalStatus			=	(SELECT TOP 1 cdescri FROM tabttab WHERE ccodtab = 12 AND climide.cestciv = tabttab.ccodigo)
+	, LoanOfficer			=	ccodana
+	, DisbursementDate		=	CONVERT(VARCHAR, dfecvig, 23)
+	, BranchCode			= 	cremcre.ccodofi	
+	, LoanPurpose			=	(SELECT TOP 1 cdescri FROM tabttab WHERE ccodtab = 099 AND cremcre.cProCre = tabttab.ccodigo)
 	, Sector			=	(SELECT TOP 1 cdescri FROM tabttab WHERE ccodtab = 098 AND ccodigo = SUBSTRING(cremcre.cSector, 1, 2))
 	, SubSector			=	(SELECT TOP 1 cdescri FROM tabttab WHERE ccodtab = 098 AND ccodigo = SUBSTRING(cremcre.cSector, 1, 4))
-	, UsedDigital		=	ISNULL((SELECT TOP 1 1 FROM dbo.__digital_transactions WHERE AccountNumber = cremcre.cCurAcc AND Channel <> 'Agent'), 0)
---	, cdeslin as CreditLine
-	, LoanProduct		=	(SELECT TOP 1 cdescri FROM tabttab WHERE ccodtab = 080 AND cremcre.cservicio = tabttab.ccodigo)
+	, UsedDigital			=	ISNULL((SELECT TOP 1 1 FROM dbo.__digital_transactions WHERE AccountNumber = cremcre.cCurAcc AND Channel <> 'Agent'), 0)
+--	, CreditLine			= 	cdeslin
+	, LoanProduct			=	(SELECT TOP 1 cdescri FROM tabttab WHERE ccodtab = 080 AND cremcre.cservicio = tabttab.ccodigo)
 	, LoanCycle			=	1 + (SELECT COUNT(cremcre.ccodcli) FROM cremcre WHERE cestado = 'G' AND cremcre.ccodcli = #selection.ccodcli)
-	, ProcessingTimeMinutes	=	DATEDIFF(MINUTE, cremcre.dFecSol, cremcre.dfecvig)
-	, ProcessingTimeDays	=	DATEDIFF(DAY, cremcre.dFecSol, cremcre.dfecvig)
+	, ProcessingTimeMinutes		=	DATEDIFF(MINUTE, cremcre.dFecSol, cremcre.dfecvig)
+	, ProcessingTimeDays		=	DATEDIFF(DAY, cremcre.dFecSol, cremcre.dfecvig)
 	, PAR30				=	ISNULL(CASE WHEN CurrentOverdueDays >= 30 THEN OutstandingAmount END, 0)
 	, InPAR30			=	ISNULL(CASE WHEN OutstandingAmount > 0 AND CurrentOverdueDays >= 30 THEN 1 END, 0)
 	, ncapdes			AS	AmountDisbursed
@@ -127,7 +129,10 @@ DROP TABLE IF EXISTS #selection
 
 DROP TABLE IF EXISTS __loans_GPS_temp
 SELECT a.*, g.*
-	, LoanCycleGroup			=	CASE WHEN LoanCycle = 1 THEN '1' WHEN LoanCycle IN (2,3,4) THEN '2-4' WHEN LoanCycle > 4 THEN '5+' ELSE NULL END
+	, LoanCycleGroup		=	CASE WHEN 	LoanCycle 	= 	1 	THEN '1' 
+						WHEN 		LoanCycle 	IN 	(2,3,4) THEN '2-4' 
+						WHEN 		LoanCycle 	> 	4 	THEN '5+' 
+						ELSE NULL END
 INTO __loans_GPS_temp FROM #selection2 a
 LEFT JOIN __branches b
 ON a.BranchCode LIKE b.BranchCode
