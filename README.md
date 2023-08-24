@@ -40,7 +40,7 @@ The function works as follows. We provide Point __A__ as _lat1, lon1_ and Point 
 
 <img src='https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Pythagoras_similar_triangles_simplified.svg/1280px-Pythagoras_similar_triangles_simplified.svg.png' alt='Pythagorean Theorem - Wikipedia' width='333px'>
 
-### GetGeoVars( BusLat, BusLon, HomeLat, HomeLon, BranchLat, BranchLon )
+### GetGeoVars ( BusLat, BusLon, HomeLat, HomeLon, BranchLat, BranchLon )
 A wrapper for some distance calculations. Used to get a table of values that can be outer applied to the loans. 
 
 Returns the following as accurate distances in meters: _BusinessToHome, BusinessToBranch, HomeToBranch_
