@@ -13,7 +13,7 @@ The GPS location of the clients home is gathered in the Juakali process and can 
 #### Client business location
   The same is true for the business' location
 #### Home business distance
-  The distance between home and business locations. This can be calculated in SQL using the STDistance(Point) function of the geography package. The client mapping project uses an intermediary function GetDistance for this, see below for details.
+  The distance between home and business locations. This can be calculated in SQL using the _STDistance(Point)_ function of the geography package. The client mapping project uses an intermediary function GetDistance for this, see below for details.
 #### Distance to branch
   How far away the branch is from the clients home, or business, respectively. Calculated as a straight line connection. Takes the branch code (ccodofi) from cremcre and matches it to the __branches table (has to be added manually).
 #### Is closest branch
@@ -23,19 +23,19 @@ The GPS location of the clients home is gathered in the Juakali process and can 
 
 ## MSSQL Functions
 ### GetDistance ( lat1, lon1, lat2, lon2 )
-A wrapper for the MSSQL function geography::Point.STDistance(Point2). Takes two locations, returns accurate distance in meters. Used to get a single value.
+A wrapper for the MSSQL function _geography::Point.STDistance(Point2)_. Takes two locations, returns accurate distance in meters. Used to get a single value.
 
 **Warning**: verifies non-null coordinates by checking if latitude > 0. This is not suitable for all regions. 
 
 ### EstimateDistance ( lat1, lon1, lat2, lon2 )
 Alternative to GetDistance with a lower computational footprint. Takes two locations, returns rough distance in meters. Used to get a single value.
 
-Because GetDensity is extremely computationally intense when calculated on a large dataset, using STDistance would result in infinitely long computing times. This function is less accurate but runs much faster because it approximates a conversion of coordinates to meters, instead of locating them and calculating the actual distance. The formula for the conversion was found here: https://en.wikipedia.org/wiki/Geographic_coordinate_system#Length_of_a_degree
+Because _GetDensity_ is extremely computationally intense when calculated on a large dataset, using STDistance would result in infinitely long computing times. This function is less accurate but runs much faster because it approximates a conversion of coordinates to meters, instead of locating them and calculating the actual distance. The formula for the conversion was found here: https://en.wikipedia.org/wiki/Geographic_coordinate_system#Length_of_a_degree
 
-The function works as follows. We provide Point A as lat1, lon1 and Point B as lat2, lon2. The function 
+The function works as follows. We provide Point __A__ as _lat1, lon1_ and Point __B__ as _lat2, lon2_. The function 
 
-1. declares variables for the conversion factor (depending on the latitude of provided location A),
-2. calculates pseudo-'vertical' and 'horizontal' distances (a and b, alias AC and CB),
+1. declares variables for the conversion factor (depending on the latitude of provided location __A__),
+2. calculates pseudo-'vertical' and 'horizontal' distances (_a_ and _b_, alias AC and CB),
 3. calculates the direct distance between the two points using the Pythagorean Theorem. 
 
 <img src='https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Pythagoras_similar_triangles_simplified.svg/1280px-Pythagoras_similar_triangles_simplified.svg.png' alt='Pythagorean Theorem - Wikipedia' width='333px'>
@@ -43,9 +43,7 @@ The function works as follows. We provide Point A as lat1, lon1 and Point B as l
 ### GetGeoVars( BusLat, BusLon, HomeLat, HomeLon, BranchLat, BranchLon )
 A wrapper for some distance calculations. Used to get a table of values that can be outer applied to the loans. 
 
-Returns the following as accurate distances in meters:
-
-BusinessToHome, BusinessToBranch, HomeToBranch
+Returns the following as accurate distances in meters: _BusinessToHome, BusinessToBranch, HomeToBranch_
 
 ### GetDensity ( lat, lon, radius )
 **Warning**: assumes conversion factors in EstimateDistance to be less than 125 km. This needs to be verified by calculating with the underlying formula if being used for countries other than Nigeria. 
