@@ -38,6 +38,8 @@ The function works as follows. We provide Point A as lat1, lon1 and Point B as l
 2. calculates pseudo-'vertical' and 'horizontal' distances (a and b, alias AC and CB),
 3. calculates the direct distance between the two points using the Pythagorean Theorem. 
 
+<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Pythagoras_similar_triangles_simplified.svg/1280px-Pythagoras_similar_triangles_simplified.svg.png' alt='Pythagorean Theorem - Wikipedia' width='333px'>
+
 ### GetGeoVars( BusLat, BusLon, HomeLat, HomeLon, BranchLat, BranchLon )
 A wrapper for some distance calculations. Used to get a table of values that can be outer applied to the loans. 
 
