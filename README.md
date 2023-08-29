@@ -3,7 +3,7 @@ Calculate geographical information based on a table of loans and a table of a ba
 
 This article documents the variables and functions developed for a demo-dashboard to showcase functionalities that are made possible by geographical information. The functions are written to be easily applyable on tables that include client GPS locations by adding the locations of the branches as a separate table. 
 
-**Warning**: some of the functions contain filters and calculations that are specific to the region of Nigeria. In order to be used for other regions, these must be adjusted!
+:warning: **Warning**: some of the functions contain filters and calculations that are specific to the region of Nigeria. In order to be used for other regions, these must be adjusted!
 
 The following variables were established by using the functions in the next section.
 
@@ -25,7 +25,7 @@ The GPS location of the clients home is gathered in the Juakali process and can 
 ### GetDistance ( lat1, lon1, lat2, lon2 )
 A wrapper for the MSSQL function _geography::Point.STDistance(Point2)_. Takes two locations, returns accurate distance in meters. Used to get a single value.
 
-**Warning**: verifies non-null coordinates by checking if latitude > 0. This is not suitable for all regions. 
+:warning: **Warning**: verifies non-null coordinates by checking if latitude > 0. This is not suitable for all regions. 
 
 ### EstimateDistance ( lat1, lon1, lat2, lon2 )
 Alternative to GetDistance with a lower computational footprint. Takes two locations, returns rough distance in meters. Used to get a single value.
@@ -46,7 +46,7 @@ A wrapper for some distance calculations. Used to get a table of values that can
 Returns the following as accurate distances in meters: _BusinessToHome, BusinessToBranch, HomeToBranch_
 
 ### GetDensity ( lat, lon, radius )
-**Warning**: assumes conversion factors in EstimateDistance to be less than 125 km. This needs to be verified by calculating with the underlying formula if being used for countries other than Nigeria. 
+⚠️ **Warning**: assumes conversion factors in EstimateDistance to be less than 125 km. This needs to be verified by calculating with the underlying formula if being used for countries other than Nigeria. 
 
 Takes a location (called **A** here) and a radius in kilometers. Returns the density of clients within that area, per square kilometer. Used to get a column of values that can be outer applied to the loans. 
 
