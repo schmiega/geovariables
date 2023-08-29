@@ -52,6 +52,6 @@ Takes a location (called **A** here) and a radius in kilometers. Returns the den
 
 1. The function reduces the number of observations to compare to by applying the Pythagorean Theorem with a degree-to-kilometers conversion factor of 125. That is higher than the actual factor (for Nigeria), which is why the relevant observations + a few more will be selected. 
 2. It then assigns each selected observation in the dataset an estimated distance to **A**
-3. and calculates the density as the number of clients inside the radius divided by the circle area of the radius $r = \pi * r^2$
+3. and calculates the density as the number of clients inside the radius divided by the circle area given the radius $a = \pi * r^2$
 
 By filtering with a rough calculation inside of a CTE query, the number of more accurate point-to-point calculations is drastically removed. This brought down the run time from (hypothetically) several weeks to 5 minutes in the case of ABN. 
