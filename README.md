@@ -52,6 +52,26 @@ Takes a location (called **A** here) and a radius in kilometers. Returns the den
 
 1. The function reduces the number of observations to compare to by applying the Pythagorean Theorem with a degree-to-kilometers conversion factor of 125. That is higher than the actual factor (for Nigeria), which is why the relevant observations + a few more will be selected. 
 2. It then assigns each selected observation in the dataset an estimated distance to **A**
-3. and calculates the density as the number of clients inside the radius divided by the circle area given the radius $a = \pi * r^2$
+3. and calculates the density as the number of clients inside the radius divided by the circle area given the radius: $\text{density} = \text{client count} / (\pi * r^2)$
 
 By filtering with a rough calculation inside of a CTE query, the number of more accurate point-to-point calculations is drastically removed. This brought down the run time from (hypothetically) several weeks to 5 minutes in the case of ABN. 
+
+## QlikSense Dashboard
+### Example
+The AH GitLab repository contains a QlikSense QVF file of the Dashboard ABN_Loans_Map. It can be imported via the Management Console at <QS URL>/qmc. 
+
+### Using Geovariables
+Geovariables can generally be used in one of two ways:
+
+1. As locations, areas or paths to display on a map
+2. As numerical or categorical variables to process in a one-dimensional fashion
+
+#### Maps
+QlikSense supports maps natively using the widget _Charts_ ➡️ _Map_. A map contains several layers. The example app uses point layers to display the individual locations of loans and branches, and a cluster layer to indicate client density when zoomed out (managed via _layer display_ ➡️ _zoom level_). Refer to the [QlikSense Documentation](https://help.qlik.com/en-US/sense/Subsystems/Hub/Content/Sense_Hub/Visualizations/Map/Map.htm) for details. 
+
+#### Variables
+Since the variables are computed on a per-loan basis, QlikSense filters can be used as usual. If the selection of loans changes, the aggregate function of the variables adjusts correspondingly. An example of this is shown on the sheet _PAR Analysis_ of the demo app. This allows for insights such as
+
+- detecting remote clients by loan officer
+- analyzing urban/rural patterns by loan product
+- etc. 
